@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Clone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root{
+    --header-h: 70px;
+    --sidebar-w: 230px;
+    --border: #ddd;
+    --muted: rgb(96, 96, 96);
+}
+
+body{
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: #f9f9f9;
+    padding-top: var(--header-h);
+}
+
+img{
+    display: block;
+    max-width: 100%;
+}
+
+.material-symbols-outlined{
+    color: var(--muted);
+    user-select: none;
+}
+
+/* ---------- Header ---------- */
+.site-header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-h);
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 0 15px;
+    background-color: white;
+}
+
+.icon-btn{
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+}
+.icon-btn:hover{
+    background-color: rgb(241, 239, 239);
+}
+
+.header-left{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.header-left img{
+    width: 100px;
+}
+
+.header-search{
+    flex: 1;
+    max-width: 640px;
+    display: flex;
+    align-items: center;
+}
+.header-search form{
+    display: flex;
+    width: 100%;
+    height: 38px;
+}
+.header-search input{
+    flex: 1;
+    min-width: 0;
+    padding: 0 16px;
+    font-size: 16px;            /* 16px stops iOS zooming on focus */
+    border: 1px solid var(--border);
+    border-radius: 20px 0 0 20px;
+}
+.header-search input:focus{
+    outline: none;
+    border-color: #1c62b9;
+}
+.header-search form button{
+    width: 60px;
+    border: 1px solid var(--border);
+    border-left: none;
+    border-radius: 0 20px 20px 0;
+    background-color: #f8f8f8;
+    cursor: pointer;
+}
+.search-back{
+    display: none;
+}
+
+.header-icons{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+.mobile-search-btn{
+    display: none;
+}
+
+.notification-container{
+    position: relative;
+}
+.notification-badge{
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 3px;
+    border-radius: 50px;
+    background: red;
+    color: white;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+}
+
+/* ---------- Layout ---------- */
+main{
+    display: flex;
+    margin-left: var(--sidebar-w);
+    transition: margin-left .2s ease;
+}
+
+aside{
+    width: var(--sidebar-w);
+    position: fixed;
+    left: 0;
+    top: var(--header-h);
+    bottom: 0;
+    background-color: white;
+    overflow-y: auto;
+    z-index: 90;
+    transition: transform .2s ease;
+}
+aside::-webkit-scrollbar{
+    display: none;
+}
+
+.sidebar-categories{
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+}
+.sidebar-category{
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    gap: 20px;
+    cursor: pointer;
+}
+.sidebar-category span{
+    font-size: 15px;
+    color: #030303;
+}
+.sidebar-category:hover{
+    background-color: #e5e5e5;
+}
+hr{
+    height: 1px;
+    background-color: #e5e5e5;
+    border: none;
+}
+
+.backdrop{
+    display: none;
+}
+
+/* Desktop: hamburger collapses the sidebar */
+body.sidebar-toggled aside{
+    transform: translateX(-100%);
+}
+body.sidebar-toggled main{
+    margin-left: 0;
+}
+
+/* ---------- Video grid ---------- */
+.recommended-section{
+    flex: 1;
+    min-width: 0;                /* lets the grid shrink instead of overflowing */
+    padding: 15px 25px;
+    border-top: 1px solid var(--border);
+}
+.title h1{
+    color: rgb(3, 3, 3);
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.videos-container{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: 28px 16px;
+}
+
+.video{
+    min-width: 0;
+}
+.thumbnail{
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #e5e5e5;
+}
+.thumbnail img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-details{
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 12px;
+}
+.author{
+    flex-shrink: 0;
+}
+.author img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.titlee{
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.titlee h3{
+    color: rgb(3, 3, 3);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.titlee a,
+.titlee span{
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+.titlee a:hover{
+    color: #030303;
+}
+
+/* ---------- Responsive ---------- */
+
+/* Tablet & below: sidebar becomes a slide-over drawer */
+@media (max-width: 1000px){
+    main{
+        margin-left: 0;
+    }
+    aside{
+        transform: translateX(-100%);
+        box-shadow: 2px 0 8px rgba(0,0,0,.15);
+    }
+    body.sidebar-toggled aside{
+        transform: translateX(0);       /* toggled = open on small screens */
+    }
+    body.sidebar-toggled .backdrop{
+        display: block;
+        position: fixed;
+        inset: var(--header-h) 0 0 0;
+        background: rgba(0,0,0,.4);
+        z-index: 80;
+    }
+}
+
+/* Phones */
+@media (max-width: 650px){
+    :root{
+        --header-h: 56px;
+    }
+    .site-header{
+        padding: 0 8px;
+        gap: 8px;
+    }
+    .header-left img{
+        width: 80px;
+    }
+    .hide-mobile{
+        display: none;
+    }
+    .mobile-search-btn{
+        display: inline-flex;
+    }
+
+    /* search turns into a full-width overlay on the header */
+    .header-search{
+        display: none;
+    }
+    .site-header.search-open .header-search{
+        display: flex;
+        position: absolute;
+        inset: 0;
+        max-width: none;
+        padding: 0 8px;
+        gap: 4px;
+        background-color: white;
+    }
+    .site-header.search-open .search-back{
+        display: inline-flex;
+    }
+
+    .recommended-section{
+        padding: 12px 0;
+        border-top: none;
+    }
+    .title h1{
+        font-size: 18px;
+        padding: 0 12px;
+    }
+    .videos-container{
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .thumbnail{
+        border-radius: 0;               /* full-bleed thumbnails like the real app */
+    }
+    .video-details{
+        padding: 0 12px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <header class="site-header" id="siteHeader">
+        <div class="header-left">
+            <button class="icon-btn" id="menuBtn" type="button" aria-label="Toggle menu">
+                <i class="material-symbols-outlined">menu</i>
+            </button>
+            <a href="#"><img src="youtube2.png" alt="YouTube"></a>
+        </div>
+
+        <div class="header-search">
+            <button class="icon-btn search-back" id="searchBack" type="button" aria-label="Close search">
+                <i class="material-symbols-outlined">arrow_back</i>
+            </button>
+            <form role="search" onsubmit="return false">
+                <input type="text" id="searchInput" placeholder="Search" aria-label="Search">
+                <button type="submit" aria-label="Search"><i class="material-symbols-outlined">search</i></button>
+            </form>
+        </div>
+
+        <div class="header-icons">
+            <button class="icon-btn mobile-search-btn" id="searchBtn" type="button" aria-label="Open search">
+                <i class="material-symbols-outlined">search</i>
+            </button>
+            <button class="icon-btn hide-mobile" type="button" aria-label="Create">
+                <i class="material-symbols-outlined">videocam</i>
+            </button>
+            <button class="icon-btn hide-mobile" type="button" aria-label="Apps">
+                <i class="material-symbols-outlined">apps</i>
+            </button>
+            <button class="icon-btn notification-container" type="button" aria-label="3 notifications">
+                <i class="material-symbols-outlined">notifications</i>
+                <span class="notification-badge">3</span>
+            </button>
+            <button class="icon-btn" type="button" aria-label="Account">
+                <i class="material-symbols-outlined">account_circle</i>
+            </button>
+        </div>
+    </header>
+
+    <div class="backdrop" id="backdrop"></div>
+
+    <main>
+        <aside>
+            <div class="sidebar-categories">
+                <div class="sidebar-category"><i class="material-symbols-outlined">home</i><span>Home</span></div>
+                <div class="sidebar-category"><i class="material-symbols-outlined">local_fire_department</i><span>Trending</span></div>
+                <div class="sidebar-category"><i class="material-symbols-outlined">subscriptions</i><span>Subscriptions</span></div>
+            </div>
+            <hr>
+            <div class="sidebar-categories">
+                <div class="sidebar-category"><i class="material-symbols-outlined">library_add_check</i><span>Library</span></div>
+                <div class="sidebar-category"><i class="material-symbols-outlined">history</i><span>History</span></div>
+                <div class="sidebar-category"><i class="material-symbols-outlined">play_arrow</i><span>Your Videos</span></div>
+                <div class="sidebar-category"><i class="material-symbols-outlined">watch_later</i><span>Watch Later</span></div>
+                <div class="sidebar-category"><i class="material-symbols-outlined">thumb_up</i><span>Liked Videos</span></div>
+            </div>
+            <hr>
+        </aside>
+
+        <section class="recommended-section">
+            <div class="title">
+                <h1>Recommended</h1>
+            </div>
+            <div class="videos-container">
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="fat.png" alt="24 Hours in an Illegal country to be fat" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="stokes twins.png" alt="Stokes Twins channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>24 Hours in an Illegal country to be fat</h3>
+                        <a href="#">Stokes Twins</a>
+                        <span>20M Views • 2 days Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="ben2.png" alt="Magic trick win a $1000" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="azelart logo.png" alt="Ben Azelart channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Magic trick win a $1000</h3>
+                        <a href="#">Ben Azelart</a>
+                        <span>15k Views • 2 Month Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="beyblade.png" alt="Beyblade X Episode 92:Perseus is the Messager" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="beyblade x.png" alt="Beyblade English channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Beyblade X Episode 92:Perseus is the Messager</h3>
+                        <a href="#">Beyblade English</a>
+                        <span>9M Views • 1 day Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="boss baby.png" alt="Boss baby faces Dr. Armstrong face to face" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="boss baby logo.png" alt="Boss baby:Family Business channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Boss baby faces Dr. Armstrong face to face</h3>
+                        <a href="#">Boss baby:Family Business</a>
+                        <span>16M Views • 1 Month Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="bluey 30mins.png" alt="30 minutes with Bluey" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="bluey logo.png" alt="Bluey channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>30 minutes with Bluey</h3>
+                        <a href="#">Bluey</a>
+                        <span>10M Views • 1 Month Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="vlad and chris.png" alt="Crazy Death stories" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="vlad and chris logo.png" alt="Vlad and Chris channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Crazy Death stories</h3>
+                        <a href="#">Vlad and Chris</a>
+                        <span>5M Views • 3 Month Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="stokes twins 2.png" alt="We stayed in the Backroom" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="stokes twins.png" alt="Stokes Twins channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>We stayed in the Backroom</h3>
+                        <a href="#">Stokes Twins</a>
+                        <span>20M Views • 2 days Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="beyblade burst turbo.png" alt="Beyblade burst Turbo ep 39" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="beyblade x.png" alt="Beyblade EN channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Beyblade burst Turbo ep 39</h3>
+                        <a href="#">Beyblade EN</a>
+                        <span>15k Views • 2 Month Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="cam huff.png" alt="Make the satisfied artwork win $10,000" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="cam logo.png" alt="cam huff channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Make the satisfied artwork win $10,000</h3>
+                        <a href="#">cam huff</a>
+                        <span>9M Views • 1 day Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="without laws.png" alt="We Survived a City without Laws" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="brent logo.png" alt="Brent Rivera Top Videos channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>We Survived a City without Laws</h3>
+                        <a href="#">Brent Rivera Top Videos</a>
+                        <span>16M Views • 1 Month Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="deadlist.png" alt="Make the Deadlist toy car win a $1000" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="azelart logo.png" alt="Ben Azelart channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Make the Deadlist toy car win a $1000</h3>
+                        <a href="#">Ben Azelart</a>
+                        <span>10M Views • 1 Month Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="salish.png" alt="Boys and Girls - Back to School" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="jordan matter logo.png" alt="Jordan Matter channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Boys and Girls - Back to School</h3>
+                        <a href="#">Jordan Matter</a>
+                        <span>5M Views • 3 Month Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="gymnastics.png" alt="Ages 1-25 Compete in Extreme Challenges" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="jordan matter logo.png" alt="Jordan Matter channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Ages 1-25 Compete in Extreme Challenges</h3>
+                        <a href="#">Jordan Matter</a>
+                        <span>8.1M Views • 3 days Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="places.png" alt="Exploring the Scariest Google Map Location" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="brent logo.png" alt="Brent Rivera channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Exploring the Scariest Google Map Location</h3>
+                        <a href="#">Brent Rivera</a>
+                        <span>28M Views • 7 Months Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="smoking.png" alt="Smoking is Bad - Mark Angel Comedy" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="living with dad.png" alt="Living with my dad channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Smoking is Bad - Mark Angel Comedy</h3>
+                        <a href="#">Living with my dad</a>
+                        <span>30M Views • 10 Months Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="loud house.png" alt="When the Loud House is having Memorable Moments" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="living with dad.png" alt="The Loud House channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>When the Loud House is having Memorable Moments</h3>
+                        <a href="#">The Loud House</a>
+                        <span>100M Views • 2 Months Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="secret room.png" alt="Hiding in our Secret Room in One Colour" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="stokes twins.png" alt="The Stokes Twins channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Hiding in our Secret Room in One Colour</h3>
+                        <a href="#">The Stokes Twins</a>
+                        <span>15M Views • 5 Months Ago</span>
+                    </div>
+                </div>
+            </article>
+            <article class="video">
+                <a class="thumbnail" href="#">
+                    <img src="mysteries.png" alt="Exploring Movie Locations i found on Google Maps" loading="lazy">
+                </a>
+                <div class="video-details">
+                    <div class="author">
+                        <img src="brent logo.png" alt="Brent Rivera channel logo" loading="lazy">
+                    </div>
+                    <div class="titlee">
+                        <h3>Exploring Movie Locations i found on Google Maps</h3>
+                        <a href="#">Brent Rivera</a>
+                        <span>20M Views • 8 Months Ago</span>
+                    </div>
+                </div>
+            </article>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const body = document.body;
+        const header = document.getElementById('siteHeader');
+        const toggle = () => body.classList.toggle('sidebar-toggled');
+        document.getElementById('menuBtn').addEventListener('click', toggle);
+        document.getElementById('backdrop').addEventListener('click', toggle);
+
+        const closeSearch = () => header.classList.remove('search-open');
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            header.classList.add('search-open');
+            document.getElementById('searchInput').focus();
+        });
+        document.getElementById('searchBack').addEventListener('click', closeSearch);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { closeSearch(); body.classList.remove('sidebar-toggled'); }
+        });
+    </script>
+</body>
+</html>
