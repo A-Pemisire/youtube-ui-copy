@@ -1,2 +1,2 @@
 # youtube-ui-copy
-a copy of the youtube ui respositive for mobile phones tablet laptop and desktop
+a copy of the youtube ui responsive for mobile phones,tablet, laptop and desktop
